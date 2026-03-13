@@ -1,0 +1,2700 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="theme-color" content="#84b6cf" />
+    <title>Flag Battle</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: radial-gradient(
+          circle at 20% 20%,
+          #001028 0%,
+          #000015 35%,
+          #000000 100%
+        );
+        font-family: Arial;
+        text-align: center;
+        position: relative;
+        overflow-x: hidden;
+        color: #fff;
+        --content-width: 100%;
+      }
+
+      /* Keep all main vertical sections the same width */
+      #topUI,
+      #instructionSection,
+      #arena,
+      #liveComments,
+      #eliminatedSection,
+      #flagsGrid {
+        width: var(--content-width);
+        max-width: var(--content-width);
+        margin-left: auto;
+        margin-right: auto;
+        box-sizing: border-box;
+      }
+
+      /* Bigger, more visible stars (primary layer) */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          radial-gradient(
+            12px 12px at 5% 15%,
+            rgba(255, 255, 255, 1),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            14px 14px at 12% 50%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            10px 10px at 20% 80%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            12px 12px at 30% 25%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            14px 14px at 40% 60%,
+            rgba(255, 255, 255, 1),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            9px 9px at 50% 10%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            11px 11px at 60% 45%,
+            rgba(255, 255, 255, 0.96),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            14px 14px at 70% 75%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            12px 12px at 80% 20%,
+            rgba(255, 255, 255, 0.99),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            10px 10px at 88% 55%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            14px 14px at 95% 85%,
+            rgba(255, 255, 255, 0.97),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            9px 9px at 15% 35%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            12px 12px at 25% 90%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            10px 10px at 35% 70%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            14px 14px at 45% 30%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            12px 12px at 55% 85%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            9px 9px at 65% 40%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            14px 14px at 75% 15%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            12px 12px at 85% 65%,
+            rgba(255, 255, 255, 0.98),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            10px 10px at 92% 35%,
+            rgba(255, 255, 255, 0.95),
+            rgba(255, 255, 255, 0)
+          );
+        background-size: 100% 100%;
+        background-attachment: fixed;
+        background-repeat: no-repeat;
+        pointer-events: none;
+        z-index: -2;
+        animation: starPulse 6s ease-in-out infinite;
+      }
+
+      /* Dense secondary star layer for more stars + twinkle */
+      body::after {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image:
+          radial-gradient(
+            3px 3px at 3% 8%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.6px 2.6px at 8% 28%,
+            rgba(255, 255, 255, 0.85),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.8px 2.8px at 13% 48%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3.2px 3.2px at 18% 68%,
+            rgba(255, 255, 255, 0.92),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3px 3px at 23% 12%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.4px 2.4px at 28% 34%,
+            rgba(255, 255, 255, 0.88),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3px 3px at 33% 56%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.6px 2.6px at 38% 78%,
+            rgba(255, 255, 255, 0.87),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3.4px 3.4px at 43% 22%,
+            rgba(255, 255, 255, 0.92),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.8px 2.8px at 48% 44%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3px 3px at 53% 66%,
+            rgba(255, 255, 255, 0.91),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.6px 2.6px at 58% 88%,
+            rgba(255, 255, 255, 0.86),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3px 3px at 63% 16%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.8px 2.8px at 68% 38%,
+            rgba(255, 255, 255, 0.88),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3.2px 3.2px at 73% 60%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.4px 2.4px at 78% 82%,
+            rgba(255, 255, 255, 0.85),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3px 3px at 83% 28%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.6px 2.6px at 88% 50%,
+            rgba(255, 255, 255, 0.87),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            3.4px 3.4px at 93% 72%,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0)
+          ),
+          radial-gradient(
+            2.8px 2.8px at 6% 72%,
+            rgba(255, 255, 255, 0.86),
+            rgba(255, 255, 255, 0)
+          );
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        pointer-events: none;
+        z-index: -1;
+        animation: starTwinkle 3.2s ease-in-out infinite;
+        animation-delay: 0.8s;
+      }
+
+      @keyframes starTwinkle {
+        0% {
+          opacity: 0.95;
+          transform: scale(1);
+          filter: brightness(1);
+        }
+
+        40% {
+          opacity: 0.5;
+          transform: scale(0.95);
+          filter: brightness(0.8);
+        }
+
+        60% {
+          opacity: 0.6;
+          transform: scale(1.02);
+          filter: brightness(1.15);
+        }
+
+        100% {
+          opacity: 0.95;
+          transform: scale(1);
+          filter: brightness(1);
+        }
+      }
+
+      @keyframes starPulse {
+        0% {
+          opacity: 1;
+          transform: scale(1);
+          filter: brightness(1);
+        }
+
+        25% {
+          opacity: 0.6;
+          transform: scale(0.98);
+          filter: brightness(0.85);
+        }
+
+        50% {
+          opacity: 0.4;
+          transform: scale(0.95);
+          filter: brightness(0.7);
+        }
+
+        75% {
+          opacity: 0.7;
+          transform: scale(1.03);
+          filter: brightness(1.2);
+        }
+
+        100% {
+          opacity: 1;
+          transform: scale(1);
+          filter: brightness(1);
+        }
+      }
+
+      #topUI {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        margin-top: 20px;
+        position: relative;
+        z-index: 10;
+      }
+
+      .panel {
+        background: black;
+        border: 3px solid white;
+        border-radius: 15px;
+        padding: 15px;
+        width: 200px;
+      }
+
+      #arena {
+        display: block;
+        margin: auto;
+        position: relative;
+        z-index: 10;
+      }
+
+      #flagsGrid {
+        width: 80%;
+        margin: auto;
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: repeat(15, 40px);
+        gap: 5px;
+        justify-content: center;
+        display: none;
+      }
+
+      .flagBtn {
+        cursor: pointer;
+      }
+
+      .flagBtn img {
+        width: 28px;
+        height: 18px;
+      }
+
+      #counter {
+        position: absolute;
+        right: 40px;
+        bottom: 40px;
+        background: black;
+        color: rgb(4, 4, 4);
+        font-size: 40px;
+        padding: 10px 20px;
+      }
+
+      #eliminatedSection {
+        margin-top: 2px;
+        padding: 1px;
+        background: black;
+        color: rgb(26, 17, 17);
+        border: 2px solid #333;
+        border-radius: 10px;
+        max-width: 90%;
+        margin-left: auto;
+        margin-right: auto;
+        width: auto;
+      }
+
+      #eliminatedFlags {
+        /* display: flex;
+        flex-wrap: wrap; */
+        gap: 1px;
+        margin-top: -8px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        /* justify-content: center; */
+      }
+
+      .eliminated-flag {
+        display: flex;
+        align-items: center;
+        width: auto;
+        height: auto;
+        gap: 1px;
+        /* padding: 1px 2px; */
+        /* background: #ffe6e6; */
+        border: 1px solid;
+        border-radius: 70%;
+      }
+
+      .eliminated-flag img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .eliminated-flag span {
+        font-size: 12px;
+        font-weight: bold;
+      }
+
+      #leaderboard {
+        height: 140px;
+        overflow-y: auto;
+        border-top: 1px solid #ddd;
+        padding-top: 10px;
+      }
+
+      #liveComments {
+        width: 100%;
+        max-width: 100%;
+        min-height: 56px;
+        max-height: 92px;
+        overflow-y: auto;
+        margin: 8px auto;
+        padding: 4px;
+        box-sizing: border-box;
+        /* border: 1px solid rgba(255, 255, 255, 0.25); */
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.45);
+        color: #fff;
+        font-size: 12px;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        align-content: flex-start;
+        scrollbar-width: none;
+        -ms-overflow-style: none;
+      }
+
+      #liveComments::-webkit-scrollbar {
+        display: none;
+      }
+
+      .comments-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 2px;
+        width: 100%;
+      }
+
+      .comment {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        padding: 2px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        box-sizing: border-box;
+      }
+
+      #leaderboard::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      #leaderboard::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      #leaderboard::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+      }
+
+      #leaderboard::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+
+      #resetBtn {
+        margin-top: 10px;
+        padding: 5px 10px;
+        background: #ff4444;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 11px;
+        font-weight: bold;
+      }
+
+      #resetBtn:hover {
+        background: #cc0000;
+      }
+
+      .winner-entry {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        padding: 5px;
+        border-radius: 5px;
+        background: #2a3c2c;
+      }
+
+      .winner-entry img {
+        width: 24px;
+        height: 15px;
+      }
+
+      #instructionSection {
+        background: white;
+        border: 2px solid black;
+        border-radius: 10px;
+        margin: 0px;
+        margin-bottom: -20px;
+        width: 390px;
+        font-size: 19px;
+        font-weight: bold;
+        color: #333;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        animation:
+          blink 1s ease-in-out infinite,
+          moveUpDown 2s ease-in-out infinite;
+        z-index: 100;
+      }
+
+      @keyframes blink {
+        0%,
+        100% {
+          opacity: 1;
+        }
+
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      @keyframes moveUpDown {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      /* Desktop/laptop portrait simulation */
+      @media (min-width: 769px) {
+        html,
+        body {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        body {
+          display: flex;
+          flex-direction: column;
+          width: 430px;
+          height: 900px;
+          margin: 0 auto;
+          padding: 12px 8px;
+          box-sizing: border-box;
+          --content-width: 100%;
+        }
+
+        #topUI {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          gap: 6px;
+          margin-top: 18px;
+          margin-bottom: 10px;
+          height: 12%;
+          flex-shrink: 0;
+          width: 100%;
+        }
+
+        .panel {
+          width: 48%;
+          max-width: none;
+          padding: 4px 6px;
+          margin: 0;
+          font-size: 16px;
+          border-width: 1px;
+          border-radius: 6px;
+          box-sizing: border-box;
+        }
+
+        #alive {
+          font-size: 40px;
+          margin: 0;
+        }
+
+        #instructionSection {
+          font-size: 18px;
+          margin: 0 0 -28px 0;
+        }
+
+        #arena {
+          height: 70%;
+          max-width: none;
+          margin: 0;
+          flex-shrink: 0;
+          display: block;
+        }
+
+        canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+          max-width: 100%;
+          max-height: 70%;
+        }
+
+        #eliminatedSection {
+          margin: -18px 0 0 0;
+          padding: 6px;
+          box-sizing: border-box;
+        }
+
+        #counter {
+          display: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        body {
+          --content-width: 100%;
+        }
+
+        #topUI {
+          flex-direction: column;
+          gap: 20px;
+          margin-top: 10px;
+        }
+
+        .panel {
+          width: 90%;
+          max-width: 500px;
+          margin: 0 auto;
+          padding: 10px;
+        }
+
+        #arena {
+          height: auto;
+          max-width: 100%;
+        }
+
+        canvas {
+          max-width: 100%;
+          height: auto;
+        }
+
+        #eliminatedSection {
+          margin: 1px auto;
+        }
+
+        #eliminatedFlags {
+          gap: 8px;
+        }
+
+        .eliminated-flag img {
+          width: 20px;
+          height: 20px;
+        }
+
+        .eliminated-flag span {
+          font-size: 10px;
+        }
+
+        #counter {
+          position: static;
+          display: inline-block;
+          margin-top: 10px;
+          font-size: 32px;
+          padding: 8px 15px;
+        }
+
+        #flagsGrid {
+          grid-template-columns: repeat(10, 35px);
+        }
+
+        .flagBtn img {
+          width: 25px;
+          height: 16px;
+        }
+
+        #leaderboard {
+          height: 120px;
+        }
+
+        #liveComments {
+          max-height: 86px;
+          font-size: 11px;
+        }
+
+        .winner-entry {
+          font-size: 11px;
+          padding: 4px;
+          gap: 5px;
+        }
+
+        .winner-entry img {
+          width: 20px;
+          height: 13px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        * {
+          -webkit-touch-callout: none;
+          -webkit-user-select: none;
+          user-select: none;
+        }
+
+        html,
+        body {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+        }
+
+        body {
+          font-size: 14px;
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
+          margin: 0;
+          margin-top: 15px;
+          margin-bottom: 15px;
+          padding: 0;
+          -webkit-font-smoothing: antialiased;
+        }
+
+        #topUI {
+          display: flex;
+          flex-direction: row;
+          justify-content: center;
+          gap: 4px;
+          margin-top: 50px;
+          margin-bottom: 10px;
+          height: 10%;
+          flex-shrink: 0;
+          width: 100%;
+        }
+
+        .panel {
+          width: 48%;
+          max-width: none;
+          padding: 3px 4px;
+          margin: 0;
+          font-size: 20px;
+          border-width: 1px;
+          border-radius: 5px;
+          box-sizing: border-box;
+        }
+
+        #alive {
+          font-size: 70px;
+          margin: 0;
+        }
+
+        .panel > span:last-of-type {
+          display: block;
+          margin-top: 4px;
+          font-size: 18px;
+          font-weight: bold;
+          color: #4cff4c;
+          text-shadow: 0 0 8px rgba(76, 255, 76, 0.6);
+          letter-spacing: 1px;
+        }
+
+        h1 {
+          margin: 0;
+        }
+
+        b {
+          font-size: 11px;
+        }
+
+        #arena {
+          height: 70%;
+          max-width: none;
+          margin-top: -20px;
+          flex-shrink: 0;
+          display: block;
+          touch-action: none;
+        }
+
+        canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+          max-width: 100vw;
+          max-height: 70vh;
+        }
+
+        #flagsGrid {
+          display: none;
+          max-height: 0%;
+        }
+
+        .flagBtn img {
+          width: 22px;
+          height: 14px;
+        }
+
+        #eliminatedSection {
+          height: auto;
+          padding: 8px;
+          border: 1px solid #333;
+          border-radius: 0;
+          background: rgb(10, 9, 9);
+          overflow-y: auto;
+          flex-shrink: 1;
+          font-size: 9px;
+          box-sizing: border-box;
+          margin-bottom: 40px;
+        }
+
+        #eliminatedFlags {
+          gap: 4px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .eliminated-flag {
+          padding: 2px;
+        }
+
+        .eliminated-flag img {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          object-fit: cover;
+          display: block;
+        }
+
+        .eliminated-flag span {
+          font-size: 8px;
+          display: none;
+        }
+
+        #counter {
+          display: none;
+        }
+
+        #leaderboard {
+          height: auto;
+          max-height: 45px;
+          border: none;
+          padding: 1px 0;
+          overflow: hidden;
+          color: black;
+          font-size: larger;
+        }
+
+        #liveComments {
+          min-height: 42px;
+          max-height: 64px;
+          margin: 4px 0;
+          padding: 4px 6px;
+          font-size: 10px;
+        }
+
+        .winner-entry {
+          font-size: 15px;
+          padding: 2px;
+          gap: 2px;
+          margin-top: 2px;
+        }
+
+        .winner-entry img {
+          width: 18px;
+          height: 14px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="topUI">
+      <div class="panel">
+        <b>TOP WINNERS(last four winners)</b>
+        <div id="leaderboard"></div>
+      </div>
+
+      <div class="panel">
+        ROUND: <span id="round">1</span>/1000
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+          "
+        >
+          <img
+            id="lastEliminatedFlag"
+            src=""
+            alt="Eliminated Flag"
+            style="width: 48px; height: 30px; display: none"
+          />
+          <div id="alive" class="alive">0</div>
+        </div>
+        <div
+          id="lastEliminatedName"
+          style="
+            min-height: 20px;
+            margin-top: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            color: #ffd54a;
+            text-align: center;
+          "
+        ></div>
+        <span
+          style="color: rgb(48, 155, 64); font-size: 20px; font-weight: bold"
+          >@Unstoppablessss</span
+        >
+      </div>
+    </div>
+
+    <div id="instructionSection">Comment name of your country to win😍</div>
+
+    <canvas id="arena"></canvas>
+
+    <div id="flagsGrid"></div>
+
+    <div id="counter">0</div>
+    <b
+      style="
+        display: block;
+        margin-bottom: 20px;
+        font-size: larger;
+        margin-top: -30px;
+      "
+      >Comment from subscribers</b
+    >
+    <div id="liveComments">Loading live comments...</div>
+    <div id="eliminatedSection">
+      <div id="eliminatedFlags"></div>
+    </div>
+    <!-- //comments -->
+
+    <script>
+      const API_KEY = "AIzaSyC2wSkYKa6exd-WfIQhbyvsO2gP8fwr-pM";
+
+      const LIVE_CHAT_ID =
+        "Cg0KC3Q0X2J1TGREcjlvKicKGFVDSE9rTkRwc0NQWTI1WWxucmtkX1FtZxILdDRfYnVMZERyOW8";
+
+      let nextPageToken = null;
+      const COMMENTS_STORAGE_KEY = "flagBattleLastComments";
+
+      /* store processed message ids */
+      let processedMessages = new Set();
+
+      /* store comments */
+      let lastComments = [];
+
+      function normalizeAndTrimComments(comments) {
+        return comments
+          .filter((comment) => comment && comment.author && comment.message)
+          .map((comment, index) => ({
+            author: comment.author,
+            message: comment.message,
+            timestamp: Number(comment.timestamp) || Date.now() + index,
+          }))
+          .sort((a, b) => b.timestamp - a.timestamp)
+          .slice(0,4);
+      }
+
+      function saveCommentsToSession() {
+        try {
+          sessionStorage.setItem(
+            COMMENTS_STORAGE_KEY,
+            JSON.stringify(normalizeAndTrimComments(lastComments)),
+          );
+        } catch (err) {
+          console.log("Could not save comments to sessionStorage:", err);
+        }
+      }
+
+      function loadCommentsFromSession() {
+        try {
+          const storedComments = sessionStorage.getItem(COMMENTS_STORAGE_KEY);
+          if (!storedComments) return false;
+
+          const parsedComments = JSON.parse(storedComments);
+          const normalizedComments = normalizeAndTrimComments(
+            Array.isArray(parsedComments) ? parsedComments : [],
+          );
+
+          if (!normalizedComments.length) return false;
+          lastComments = normalizedComments;
+          return true;
+        } catch (err) {
+          console.log("Could not load comments from sessionStorage:", err);
+          return false;
+        }
+      }
+
+      function updateCommentsUI() {
+        const container = document.getElementById("liveComments");
+        container.innerHTML = "";
+
+        lastComments = normalizeAndTrimComments(lastComments);
+        console.log("Displaying comments:", lastComments);
+        for (let i = 0; i < lastComments.length; i += 2) {
+          const row = document.createElement("div");
+          row.className = "comments-row";
+
+          const pair = lastComments.slice(i, i + 2);
+          pair.forEach((c) => {
+            const div = document.createElement("div");
+            div.className = "comment";
+
+            // Display full message; CSS will truncate with ellipsis if it exceeds available width
+            div.innerHTML = `<strong>${c.author}</strong>: <span>${c.message}</span>`;
+            row.appendChild(div);
+          });
+
+          // Keep the second slot reserved so layout always stays 2-per-row.
+          if (pair.length === 1) {
+            const placeholder = document.createElement("div");
+            placeholder.className = "comment";
+            placeholder.innerHTML = "&nbsp;";
+            row.appendChild(placeholder);
+          }
+
+          container.appendChild(row);
+        }
+      }
+
+      /* dummy fallback comments */
+
+      function addDummyComments() {
+        lastComments = normalizeAndTrimComments([
+          {
+            author: "Rohit",
+            message: "Hello everyone!",
+            timestamp: Date.now() - 4000,
+          },
+          {
+            author: "Anita",
+            message: "Nice stream 👍",
+            timestamp: Date.now() - 3000,
+          },
+          {
+            author: "Sam",
+            message: "United States",
+            timestamp: Date.now() - 2000,
+          },
+          { author: "Priya", message: "India", timestamp: Date.now() - 1000 },
+        ]);
+
+        saveCommentsToSession();
+        updateCommentsUI();
+      }
+
+      async function fetchLiveComments() {
+        try {
+          let url = `https://www.googleapis.com/youtube/v3/liveChat/messages?liveChatId=${LIVE_CHAT_ID}&part=snippet,authorDetails,id&key=${API_KEY}`;
+
+          if (nextPageToken) {
+            url += `&pageToken=${nextPageToken}`;
+          }
+
+          const response = await fetch(url);
+          const data = await response.json();
+
+          if (!response.ok || !data.items) {
+            console.log("API failed, using stored comments or dummy comments");
+            if (!loadCommentsFromSession()) {
+              addDummyComments();
+            } else {
+              updateCommentsUI();
+            }
+            return;
+          }
+
+          data.items.forEach((item, index) => {
+            const id = item.id;
+
+            if (processedMessages.has(id)) return;
+            processedMessages.add(id);
+
+            const author = item.authorDetails.displayName;
+            const message = item.snippet.displayMessage;
+
+            lastComments.push({
+              author: author,
+              message: message,
+              timestamp: Date.now() + index,
+            });
+            console.log("New comment:", author, message);
+          });
+
+          lastComments = normalizeAndTrimComments(lastComments);
+          saveCommentsToSession();
+          updateCommentsUI();
+          nextPageToken = data.nextPageToken;
+        } catch (err) {
+          console.log("Error fetching chat:", err);
+          if (!loadCommentsFromSession()) {
+            addDummyComments();
+          } else {
+            updateCommentsUI();
+          }
+        }
+      }
+
+      /* fetch every 25 seconds */
+      setInterval(fetchLiveComments, 300000);
+
+      // Clear storage on each reload
+      sessionStorage.removeItem(COMMENTS_STORAGE_KEY);
+
+      // Always start with dummy comments
+      addDummyComments();
+
+      // Trigger one real fetch immediately as well.
+      fetchLiveComments();
+    </script>
+    <script>
+      const canvas = document.getElementById("arena");
+      const ctx = canvas.getContext("2d");
+      function isMobileViewport() {
+        return window.innerWidth <= 768;
+      }
+
+      (function enableAutoFullscreenOnTouch() {
+        function isFullscreen() {
+          return !!(
+            document.fullscreenElement ||
+            document.webkitFullscreenElement ||
+            document.mozFullScreenElement ||
+            document.msFullscreenElement
+          );
+        }
+
+        function maybeEnterFullscreen() {
+          // Auto fullscreen only on mobile/tablet; never on laptop/desktop.
+          if (!isMobileViewport()) return;
+          if (!isFullscreen()) {
+            requestFullscreen();
+          }
+        }
+
+        ["touchstart", "pointerdown", "click"].forEach((ev) => {
+          document.addEventListener(ev, maybeEnterFullscreen, {
+            passive: true,
+          });
+        });
+      })();
+      // --- Audio helper: lightweight tones for bounces/collisions ---
+      let audioCtx = null;
+      let speechVoicesReady = false;
+      let speechActivated = false;
+      let pendingSpeechText = null;
+      function ensureAudio() {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      }
+      function resumeAudio() {
+        ensureAudio();
+        if (audioCtx && audioCtx.state === "suspended") {
+          return audioCtx.resume().catch(() => {});
+        }
+        return Promise.resolve();
+      }
+      function markSpeechVoicesReady() {
+        try {
+          if (
+            window.speechSynthesis &&
+            window.speechSynthesis.getVoices().length > 0
+          ) {
+            speechVoicesReady = true;
+          }
+        } catch (e) {}
+      }
+
+      function flushPendingSpeech() {
+        if (!pendingSpeechText || !speechActivated) return;
+        const text = pendingSpeechText;
+        pendingSpeechText = null;
+        speakText(text, true);
+      }
+
+      function unlockAudioAndSpeech() {
+        speechActivated = true;
+        resumeAudio();
+        markSpeechVoicesReady();
+        flushPendingSpeech();
+      }
+      // Keep attempting unlock on interactions; some browsers require repeated gestures.
+      ["pointerdown", "touchstart", "click", "keydown"].forEach((ev) => {
+        document.addEventListener(ev, unlockAudioAndSpeech, { passive: true });
+      });
+      window.addEventListener("focus", unlockAudioAndSpeech);
+      if (
+        window.speechSynthesis &&
+        "onvoiceschanged" in window.speechSynthesis
+      ) {
+        window.speechSynthesis.onvoiceschanged = markSpeechVoicesReady;
+      }
+
+      function playToneNow(freq, duration = 0.06, type = "triangle") {
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.value = freq;
+        g.gain.value = 0.0001;
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.22, now + 0.008);
+        o.start(now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+        o.stop(now + duration + 0.02);
+      }
+
+      function playTone(freq, duration = 0.06, type = "triangle") {
+        try {
+          ensureAudio();
+          if (!audioCtx) return;
+          if (audioCtx.state === "suspended") {
+            resumeAudio().then(() => {
+              if (audioCtx && audioCtx.state === "running") {
+                playToneNow(freq, duration, type);
+              }
+            });
+            return;
+          }
+          playToneNow(freq, duration, type);
+        } catch (e) {
+          // ignore audio errors on restrictive browsers
+        }
+      }
+
+      function playPleasantToneNow(freq, duration = 0.08) {
+        const now = audioCtx.currentTime;
+
+        const o1 = audioCtx.createOscillator();
+        const o2 = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        const lp = audioCtx.createBiquadFilter();
+
+        o1.type = "sine";
+        o2.type = "sine";
+        o1.frequency.value = freq;
+        o2.frequency.value = freq * 1.012;
+
+        lp.type = "lowpass";
+        lp.frequency.value = Math.max(900, freq * 2);
+        lp.Q.value = 1;
+
+        g.gain.value = 0.0001;
+
+        o1.connect(g);
+        o2.connect(g);
+        g.connect(lp);
+        lp.connect(audioCtx.destination);
+
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.linearRampToValueAtTime(0.2, now + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + duration + 0.01);
+
+        o1.start(now);
+        o2.start(now);
+        o1.stop(now + duration + 0.02);
+        o2.stop(now + duration + 0.02);
+      }
+
+      // Pleasant bell-like tone using two slightly detuned sines and a gentle envelope
+      function playPleasantTone(freq, duration = 0.08) {
+        try {
+          ensureAudio();
+          if (!audioCtx) return;
+          if (audioCtx.state === "suspended") {
+            resumeAudio().then(() => {
+              if (audioCtx && audioCtx.state === "running") {
+                playPleasantToneNow(freq, duration);
+              }
+            });
+            return;
+          }
+          playPleasantToneNow(freq, duration);
+        } catch (e) {
+          // ignore audio errors
+        }
+      }
+
+      function playBounceSound() {
+        playPleasantTone(420, 0.06);
+      }
+
+      function playCollisionSound() {
+        playPleasantTone(860, 0.11);
+      }
+
+      function maybePlayCollisionSound() {
+        const now = performance.now();
+        if (now - lastCollisionSoundAt < 80) return;
+        lastCollisionSoundAt = now;
+        playCollisionSound();
+      }
+
+      function speakText(text, interrupt = true) {
+        try {
+          if (!window.speechSynthesis) return;
+          const synth = window.speechSynthesis;
+
+          if (!speechActivated) {
+            pendingSpeechText = text;
+            return;
+          }
+
+          const say = () => {
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = "en-US";
+            u.volume = 1;
+            u.rate = 1;
+            u.pitch = 1;
+            const voices = synth.getVoices();
+            if (voices && voices.length) {
+              const preferred = voices.find(
+                (v) => v.lang && v.lang.toLowerCase().startsWith("en"),
+              );
+              if (preferred) u.voice = preferred;
+            }
+            u.onend = () => {
+              flushPendingSpeech();
+            };
+            synth.speak(u);
+          };
+
+          if (interrupt) {
+            synth.cancel();
+          }
+
+          if (speechVoicesReady || synth.getVoices().length > 0) {
+            speechVoicesReady = true;
+            setTimeout(say, interrupt ? 60 : 0);
+          } else {
+            setTimeout(() => {
+              markSpeechVoicesReady();
+              say();
+            }, 250);
+          }
+
+          setTimeout(() => {
+            if (!synth.speaking && !synth.pending) say();
+          }, 300);
+        } catch (e) {
+          // ignore speech errors
+        }
+      }
+
+      // Announce winner using Web Speech API
+      function speakWinner(code) {
+        try {
+          const name = countryNames[code] || code;
+          const text = name + " wins";
+          try {
+            playPleasantTone(980, 0.22);
+          } catch (e) {}
+          speakText(text);
+        } catch (e) {
+          // ignore speech errors
+        }
+      }
+
+      // Announce an eliminated country with a soft tone + speech
+      function announceEliminated(code) {
+        try {
+          // play a very soft ping
+          try {
+            playTone(420, 0.09, "triangle");
+          } catch (e) {}
+
+          // speak "<Country> is out"
+          const name = countryNames[code] || code;
+          const text = name + " is out";
+          speakText(text);
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // Function to make canvas square and responsive
+      function setupCanvas() {
+        let size;
+        if (window.innerWidth <= 480) {
+          // Mobile: use full width (up to 480)
+          size = Math.min(480, window.innerWidth);
+        } else {
+          // Desktop/laptop portrait mode: fit to visible arena box to avoid clipping.
+          const arenaRect = canvas.getBoundingClientRect();
+          const fromArena = Math.floor(
+            Math.min(arenaRect.width || 0, arenaRect.height || 0),
+          );
+          size = fromArena > 0 ? fromArena : 430;
+        }
+
+        // Handle high-DPI screens: set backing store size and scale context
+        const ratio = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(size * ratio);
+        canvas.height = Math.floor(size * ratio);
+        canvas.style.width = size + "px";
+        canvas.style.height = size + "px";
+        ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+        // Update game constants based on logical canvas size
+        window.centerX = size / 2;
+        window.centerY = size / 2;
+        // Increase play area radius slightly so the ring is larger
+        window.radius = size * 0.41;
+      }
+
+      // Setup canvas on load
+      setupCanvas();
+
+      // Lock orientation to landscape on mobile for better gameplay
+      if (
+        window.innerWidth <= 480 &&
+        screen.orientation &&
+        screen.orientation.lock
+      ) {
+        screen.orientation.lock("landscape").catch((err) => {
+          // Fallback if orientation lock fails
+          console.log("Orientation lock failed:", err);
+        });
+      }
+
+      // Handle fullscreen changes
+      document.addEventListener("fullscreenchange", () => {
+        setupCanvas();
+      });
+      document.addEventListener("webkitfullscreenchange", () => {
+        setupCanvas();
+      });
+      document.addEventListener("mozfullscreenchange", () => {
+        setupCanvas();
+      });
+      document.addEventListener("msfullscreenchange", () => {
+        setupCanvas();
+      });
+
+      // Resize canvas when window changes
+      window.addEventListener("resize", () => {
+        setupCanvas();
+      });
+
+      // Handle device orientation changes for mobile
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => {
+          setupCanvas();
+        }, 1000);
+      });
+
+      // Prevent scrolling on mobile
+      document.body.addEventListener(
+        "touchmove",
+        (e) => {
+          if (e.target === canvas || e.target.closest("#arena")) {
+            e.preventDefault();
+          }
+        },
+        false,
+      );
+
+      // Fullscreen functionality for mobile
+      function requestFullscreen() {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+          elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+          // Safari
+          elem.webkitRequestFullscreen();
+        } else if (elem.mozRequestFullScreen) {
+          // Firefox
+          elem.mozRequestFullScreen();
+        } else if (elem.msRequestFullscreen) {
+          // IE/Edge
+          elem.msRequestFullscreen();
+        }
+      }
+
+      // Auto-request fullscreen on mobile on first interaction
+      let fullscreenRequested = false;
+      document.addEventListener(
+        "touchstart",
+        () => {
+          if (!fullscreenRequested && window.innerWidth <= 480) {
+            fullscreenRequested = true;
+            setTimeout(() => {
+              requestFullscreen();
+            }, 100);
+          }
+        },
+        { once: false },
+      );
+
+      let rotation = 0;
+      let rotationSpeed = 0.012;
+
+      // Secret winner feature: set this to a country code (e.g., "us", "gb", "fr") to make that country always win
+      // Leave empty "" to disable and let any country win
+      // const SECRET_WINNER = "in"; // Change this to the country code you want to guarantee as winner
+      const secretWinnerList = [
+        "in", // India (extra chance since it's a neighbor)
+        "in", // India (extra chance since it's a neighbor)
+        "us", // United States
+        "ir", // Iran
+        "il", // Israel
+        "sa", // Saudi Arabia
+        "ae", // United Arab Emirates
+        "in", // India,
+        "in", // India (extra chance since it's a neighbor)
+        "in", // India (extra chance since it's a neighbor)
+        "gb", // United Kingdom
+        "fr", // France
+        "cn", // China
+        "de", // Germany
+        "mx", // Mexico
+        "za", // South Africa
+        "eg", // Egypt
+        "pk", // Pakistan (neighbor)
+        "bd", // Bangladesh (neighbor)
+        "np", // Nepal (neighbor)
+        "bt", // Bhutan (neighbor)
+        "mm", // Myanmar (neighbor)
+        "af", // Afghanistan (neighbor)
+        "lk", // Sri Lanka (neighbor)
+        "mv", // Maldives (neighbor)
+        "tr", // Turkey (neighbor)
+        "kp", // North Korea
+        "ru", // Russia,
+        "lb", // Lebanon (neighbor)
+        "nz", // New Zealand
+        "iq", // Iraq (neighbor)
+      ];
+      // const secretWinnerList = ["in"];
+      let SECRET_WINNER =
+        secretWinnerList[Math.floor(Math.random() * secretWinnerList.length)];
+      console.log("Secret winner for this session:", SECRET_WINNER);
+      let round = 1;
+      let flags = [];
+      let winners = [];
+      let eliminatedFlags = [];
+      let gameActive = true;
+      let restartTimeout = null;
+
+      const roundEl = document.getElementById("round");
+      const aliveEl = document.getElementById("alive");
+      const leaderboardEl = document.getElementById("leaderboard");
+      const eliminatedFlagsEl = document.getElementById("eliminatedFlags");
+      const lastEliminatedFlagEl =
+        document.getElementById("lastEliminatedFlag");
+      const lastEliminatedNameEl =
+        document.getElementById("lastEliminatedName");
+      let lastCollisionSoundAt = 0;
+
+      const flagList = [
+        "af",
+        "al",
+        "dz",
+        "ad",
+        "ao",
+        "ar",
+        "am",
+        "au",
+        "at",
+        "co",
+        "km",
+        "cg",
+        "cd",
+        "cr",
+        "hr",
+        "cu",
+        "cy",
+        "cz",
+        "dk",
+        "dj",
+        "dm",
+        "do",
+        "ec",
+        "eg",
+        "sv",
+        "gq",
+        "er",
+        "ee",
+        "et",
+        "fj",
+        "fi",
+        "fr",
+        "ga",
+        "gm",
+        "ge",
+        "de",
+        "gh",
+        "gr",
+        "gt",
+        "gn",
+        "gw",
+        "gy",
+        "ht",
+        "hn",
+        "hu",
+        "is",
+        "in",
+        "id",
+        "ir",
+        "iq",
+        "ie",
+        "il",
+        "it",
+        "jm",
+        "jp",
+        "jo",
+        "kz",
+        "ke",
+        "ki",
+        "kw",
+        "kg",
+        "la",
+        "lv",
+        "lb",
+        "ls",
+        "lr",
+        "ly",
+        "li",
+        "lt",
+        "lu",
+        "mg",
+        "mw",
+        "my",
+        "mv",
+        "ml",
+        "mt",
+        "mh",
+        "mr",
+        "mu",
+        "mx",
+        "fm",
+        "md",
+        "mc",
+        "mn",
+        "me",
+        "ma",
+        "mz",
+        "mm",
+        "na",
+        "nr",
+        "np",
+        "nl",
+        "nz",
+        "ni",
+        "ne",
+        "ng",
+        "kp",
+        "mk",
+        "no",
+        "om",
+        "pk",
+        "pw",
+        "pa",
+        "pg",
+        "py",
+        "pe",
+        "ph",
+        "pl",
+        "pt",
+        "qa",
+        "ro",
+        "ru",
+        "rw",
+        "kn",
+        "lc",
+        "vc",
+        "ws",
+        "sm",
+        "st",
+        "sa",
+        "sn",
+        "rs",
+        "sc",
+        "sl",
+        "sg",
+        "sk",
+        "si",
+        "sb",
+        "so",
+        "za",
+        "kr",
+        "ss",
+        "es",
+        "lk",
+        "sd",
+        "sr",
+        "se",
+        "ch",
+        "sy",
+        "tj",
+        "tz",
+        "th",
+        "tl",
+        "tg",
+        "to",
+        "tt",
+        "tn",
+        "tr",
+        "tm",
+        "tv",
+        "ug",
+        "ua",
+        "ae",
+        "gb",
+        "us",
+        "uy",
+        "uz",
+        "vu",
+        "va",
+        "ve",
+        "vn",
+        "ye",
+        "zm",
+        "zw",
+      ];
+
+      const countryNames = {
+        af: "Afghanistan",
+        al: "Albania",
+        dz: "Algeria",
+        ad: "Andorra",
+        ao: "Angola",
+        ar: "Argentina",
+        am: "Armenia",
+        au: "Australia",
+        at: "Austria",
+        az: "Azerbaijan",
+        bh: "Bahrain",
+        bd: "Bangladesh",
+        by: "Belarus",
+        be: "Belgium",
+        bz: "Belize",
+        bj: "Benin",
+        bt: "Bhutan",
+        bo: "Bolivia",
+        ba: "Bosnia and Herzegovina",
+        bw: "Botswana",
+        br: "Brazil",
+        bn: "Brunei",
+        bg: "Bulgaria",
+        bf: "Burkina Faso",
+        bi: "Burundi",
+        kh: "Cambodia",
+        cm: "Cameroon",
+        ca: "Canada",
+        cf: "Central African Republic",
+        td: "Chad",
+        cl: "Chile",
+        cn: "China",
+        co: "Colombia",
+        km: "Comoros",
+        cg: "Republic of the Congo",
+        cd: "Democratic Republic of the Congo",
+        cr: "Costa Rica",
+        hr: "Croatia",
+        cu: "Cuba",
+        cy: "Cyprus",
+        cz: "Czechia",
+        dk: "Denmark",
+        dj: "Djibouti",
+        dm: "Dominica",
+        do: "Dominican Republic",
+        ec: "Ecuador",
+        eg: "Egypt",
+        sv: "El Salvador",
+        gq: "Equatorial Guinea",
+        er: "Eritrea",
+        ee: "Estonia",
+        et: "Ethiopia",
+        fj: "Fiji",
+        fi: "Finland",
+        fr: "France",
+        ga: "Gabon",
+        gm: "Gambia",
+        ge: "Georgia",
+        de: "Germany",
+        gh: "Ghana",
+        gr: "Greece",
+        gt: "Guatemala",
+        gn: "Guinea",
+        gw: "Guinea-Bissau",
+        gy: "Guyana",
+        ht: "Haiti",
+        hn: "Honduras",
+        hu: "Hungary",
+        is: "Iceland",
+        in: "India",
+        id: "Indonesia",
+        ir: "Iran",
+        iq: "Iraq",
+        ie: "Ireland",
+        il: "Israel",
+        it: "Italy",
+        jm: "Jamaica",
+        jp: "Japan",
+        jo: "Jordan",
+        kz: "Kazakhstan",
+        ke: "Kenya",
+        ki: "Kiribati",
+        kw: "Kuwait",
+        kg: "Kyrgyzstan",
+        la: "Laos",
+        lv: "Latvia",
+        lb: "Lebanon",
+        ls: "Lesotho",
+        lr: "Liberia",
+        ly: "Libya",
+        li: "Liechtenstein",
+        lt: "Lithuania",
+        lu: "Luxembourg",
+        mg: "Madagascar",
+        mw: "Malawi",
+        my: "Malaysia",
+        mv: "Maldives",
+        ml: "Mali",
+        mt: "Malta",
+        mh: "Marshall Islands",
+        mr: "Mauritania",
+        mu: "Mauritius",
+        mx: "Mexico",
+        fm: "Micronesia",
+        md: "Moldova",
+        mc: "Monaco",
+        mn: "Mongolia",
+        me: "Montenegro",
+        ma: "Morocco",
+        mz: "Mozambique",
+        mm: "Myanmar",
+        na: "Namibia",
+        nr: "Nauru",
+        np: "Nepal",
+        nl: "Netherlands",
+        nz: "New Zealand",
+        ni: "Nicaragua",
+        ne: "Niger",
+        ng: "Nigeria",
+        kp: "North Korea",
+        mk: "North Macedonia",
+        no: "Norway",
+        om: "Oman",
+        pk: "Pakistan",
+        pw: "Palau",
+        pa: "Panama",
+        pg: "Papua New Guinea",
+        py: "Paraguay",
+        pe: "Peru",
+        ph: "Philippines",
+        pl: "Poland",
+        pt: "Portugal",
+        qa: "Qatar",
+        ro: "Romania",
+        ru: "Russia",
+        rw: "Rwanda",
+        kn: "Saint Kitts and Nevis",
+        lc: "Saint Lucia",
+        vc: "Saint Vincent and the Grenadines",
+        ws: "Samoa",
+        sm: "San Marino",
+        st: "Sao Tome and Principe",
+        sa: "Saudi Arabia",
+        sn: "Senegal",
+        rs: "Serbia",
+        sc: "Seychelles",
+        sl: "Sierra Leone",
+        sg: "Singapore",
+        sk: "Slovakia",
+        si: "Slovenia",
+        sb: "Solomon Islands",
+        so: "Somalia",
+        za: "South Africa",
+        kr: "South Korea",
+        ss: "South Sudan",
+        es: "Spain",
+        lk: "Sri Lanka",
+        sd: "Sudan",
+        sr: "Suriname",
+        se: "Sweden",
+        ch: "Switzerland",
+        sy: "Syria",
+        tj: "Tajikistan",
+        tz: "Tanzania",
+        th: "Thailand",
+        tl: "Timor-Leste",
+        tg: "Togo",
+        to: "Tonga",
+        tt: "Trinidad and Tobago",
+        tn: "Tunisia",
+        tr: "Turkey",
+        tm: "Turkmenistan",
+        tv: "Tuvalu",
+        ug: "Uganda",
+        ua: "Ukraine",
+        ae: "United Arab Emirates",
+        gb: "United Kingdom",
+        us: "United States",
+        uy: "Uruguay",
+        uz: "Uzbekistan",
+        vu: "Vanuatu",
+        va: "Vatican City",
+        ve: "Venezuela",
+        vn: "Vietnam",
+        ye: "Yemen",
+        zm: "Zambia",
+        zw: "Zimbabwe",
+      };
+
+      class Flag {
+        constructor(code) {
+          this.code = code;
+
+          this.img = new Image();
+          this.img.src =
+            "https://flagcdn.com/w40/" + code.toLowerCase() + ".png";
+
+          this.x = window.centerX + (Math.random() * 100 - 50);
+          this.y = window.centerY + (Math.random() * 100 - 50);
+          // Keep spawn speed moderate so flags remain controllable.
+          this.vx = (Math.random() - 0.5) * 2.2;
+          this.vy = (Math.random() - 0.5) * 2.2;
+
+          this.dead = false;
+        }
+
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+
+          // Keep lone flags moving at a minimum cruising speed.
+          // Increase pace in endgame so rounds close faster.
+          const aliveCount = Array.isArray(flags) ? flags.length : 999;
+          const minCruiseSpeed =
+            aliveCount <= 3 ? 2.4 : aliveCount <= 6 ? 2.4 : 1.3;
+          const maxCruiseSpeed =
+            aliveCount <= 3 ? 4.8 : aliveCount <= 6 ? 5.2 : 3.6;
+          const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+          if (currentSpeed > 0 && currentSpeed < minCruiseSpeed) {
+            this.vx = (this.vx / currentSpeed) * minCruiseSpeed;
+            this.vy = (this.vy / currentSpeed) * minCruiseSpeed;
+          }
+          if (currentSpeed > maxCruiseSpeed) {
+            this.vx = (this.vx / currentSpeed) * maxCruiseSpeed;
+            this.vy = (this.vy / currentSpeed) * maxCruiseSpeed;
+          }
+
+          let dx = this.x - window.centerX;
+          let dy = this.y - window.centerY;
+
+          let dist = Math.sqrt(dx * dx + dy * dy);
+
+          // Allow a small margin so flags near the boundary can enter the gap reliably
+          if (dist > window.radius - 6) {
+            let angle = Math.atan2(dy, dx);
+
+            let gapStart = rotation;
+            let gapEnd = rotation + 0.8;
+
+            let normalizedAngle = angle;
+            let normalizedStart = gapStart % (Math.PI * 2);
+            let normalizedEnd = gapEnd % (Math.PI * 2);
+
+            if (normalizedAngle < 0) normalizedAngle += Math.PI * 2;
+            if (normalizedStart < 0) normalizedStart += Math.PI * 2;
+            if (normalizedEnd < 0) normalizedEnd += Math.PI * 2;
+
+            let hitGap = false;
+
+            if (normalizedStart < normalizedEnd) {
+              hitGap =
+                normalizedAngle > normalizedStart &&
+                normalizedAngle < normalizedEnd;
+            } else {
+              hitGap =
+                normalizedAngle > normalizedStart ||
+                normalizedAngle < normalizedEnd;
+            }
+
+            if (hitGap) {
+              // Flag hit the gap: mark as dead (unless it's the secret winner)
+              if (SECRET_WINNER && this.code === SECRET_WINNER) {
+                // Secret winner cannot be eliminated - teleport to a random safe spot instead
+                const teleportAngle = Math.random() * Math.PI * 2;
+                const teleportRadius = Math.random() * (window.radius * 0.7);
+                this.x =
+                  window.centerX + Math.cos(teleportAngle) * teleportRadius;
+                this.y =
+                  window.centerY + Math.sin(teleportAngle) * teleportRadius;
+                this.vx = (Math.random() - 0.5) * 2.2;
+                this.vy = (Math.random() - 0.5) * 2.2;
+              } else {
+                this.dead = true;
+              }
+            } else {
+              // Smooth bounce with continuous path
+              let normalizeLen = Math.sqrt(dx * dx + dy * dy);
+
+              if (normalizeLen > 0) {
+                // Reverse velocity with adaptive damping.
+                // As the round nears the end, keep more bounce so finishes are quicker.
+                const aliveCountEstimate = Math.max(1, flags.length);
+                const endgameBounce = aliveCountEstimate <= 6;
+                const finalDuelBounce = aliveCountEstimate <= 3;
+                let randomFactor = finalDuelBounce
+                  ? 1.05 + Math.random() * 0.15
+                  : endgameBounce
+                    ? 1.15 + Math.random() * 0.25
+                    : 0.95 + Math.random() * 0.2;
+                this.vx *= -randomFactor;
+                this.vy *= -randomFactor;
+                // play a small tone on bounce with the circle
+                try {
+                  playBounceSound();
+                } catch (e) {}
+
+                // Ensure minimum velocity to prevent slowdown
+                let speedSq = this.vx * this.vx + this.vy * this.vy;
+                if (speedSq < 2) {
+                  let speed = Math.sqrt(speedSq);
+                  if (speed > 0) {
+                    this.vx = (this.vx / speed) * 1.8;
+                    this.vy = (this.vy / speed) * 1.8;
+                  }
+                }
+
+                // Add perturbation to change direction
+                let perturbationX = (Math.random() - 0.5) * 1.0;
+                let perturbationY = (Math.random() - 0.5) * 1.0;
+                this.vx += perturbationX;
+                this.vy += perturbationY;
+
+                // Add tangential velocity to spread flags around circle
+                let angle = Math.atan2(this.vy, this.vx);
+                let tangentX =
+                  Math.cos(angle + Math.PI / 2) * (Math.random() - 0.5) * 1.0;
+                let tangentY =
+                  Math.sin(angle + Math.PI / 2) * (Math.random() - 0.5) * 1.0;
+                this.vx += tangentX;
+                this.vy += tangentY;
+
+                // Only push back toward center if very close to boundary
+                let centerX = window.centerX - this.x;
+                let centerY = window.centerY - this.y;
+                let dist = Math.sqrt(centerX * centerX + centerY * centerY);
+                if (dist > 0 && dist > window.radius * 0.9) {
+                  // Weak nudge only at extreme distance
+                  this.vx += (centerX / dist) * 0.2;
+                  this.vy += (centerY / dist) * 0.2;
+                }
+              }
+            }
+          }
+
+          // Hard clamp as a final safety so fast frames never leave flags outside the ring.
+          const finalDx = this.x - window.centerX;
+          const finalDy = this.y - window.centerY;
+          const finalDist = Math.sqrt(finalDx * finalDx + finalDy * finalDy);
+          const maxInsideRadius = window.radius - 3;
+          if (finalDist > maxInsideRadius) {
+            const a = Math.atan2(finalDy, finalDx);
+            this.x = window.centerX + Math.cos(a) * maxInsideRadius;
+            this.y = window.centerY + Math.sin(a) * maxInsideRadius;
+            const aliveCountNow = Array.isArray(flags) ? flags.length : 999;
+            const clampDamping =
+              aliveCountNow <= 3 ? 0.98 : aliveCountNow <= 6 ? 0.92 : 0.85;
+            this.vx *= clampDamping;
+            this.vy *= clampDamping;
+          }
+        }
+
+        draw() {
+          // increase size of flags inside the circle
+          // responsive flag size: smaller on mobile
+          const isMobile = window.innerWidth <= 480;
+          // make mobile flags smaller
+          const flagW = isMobile ? 20 : 22;
+          const flagH = isMobile ? 12 : 14;
+          ctx.drawImage(
+            this.img,
+            this.x - flagW / 2,
+            this.y - flagH / 2,
+            flagW,
+            flagH,
+          );
+        }
+      }
+
+      function createFlags() {
+        flags = flagList.map((code) => new Flag(code));
+      }
+
+      function updateLeaderboard() {
+        leaderboardEl.innerHTML = "";
+        const fragment = document.createDocumentFragment();
+        winners.forEach((winner, index) => {
+          let entry = document.createElement("div");
+          entry.className = "winner-entry";
+
+          let serialNum = document.createElement("span");
+          serialNum.textContent = String(winners.length - index) + ".";
+          serialNum.style.fontWeight = "bold";
+          serialNum.style.minWidth = "25px";
+
+          let img = document.createElement("img");
+          img.src = "https://flagcdn.com/w40/" + winner.toLowerCase() + ".png";
+
+          let name = document.createElement("span");
+          name.textContent = countryNames[winner];
+
+          entry.appendChild(serialNum);
+          entry.appendChild(img);
+          entry.appendChild(name);
+          fragment.appendChild(entry);
+        });
+        leaderboardEl.appendChild(fragment);
+      }
+
+      function resetWinners() {
+        winners = [];
+        updateLeaderboard();
+      }
+
+      function updateEliminatedFlags() {
+        eliminatedFlagsEl.innerHTML = "";
+        const fragment = document.createDocumentFragment();
+        eliminatedFlags.forEach((code) => {
+          let entry = document.createElement("div");
+          entry.className = "eliminated-flag";
+
+          let img = document.createElement("img");
+          img.src = "https://flagcdn.com/w40/" + code.toLowerCase() + ".png";
+
+          let name = document.createElement("span");
+          name.textContent = countryNames[code];
+
+          entry.appendChild(img);
+          //   entry.appendChild(name);
+          fragment.appendChild(entry);
+        });
+        eliminatedFlagsEl.appendChild(fragment);
+      }
+
+      function restartGame() {
+        // reset any previous winner announcement and eliminated announcements
+        window._winnerAnnounced = false;
+        window.actualWinner = null;
+        window._lastEliminatedAnnounced = null;
+
+        // Reset secret winner each round
+        SECRET_WINNER =
+          secretWinnerList[Math.floor(Math.random() * secretWinnerList.length)];
+        console.log(
+          "New secret winner for round " + (round + 1) + ":",
+          SECRET_WINNER,
+        );
+
+        gameActive = true;
+        round++;
+        roundEl.textContent = String(round);
+        eliminatedFlags = [];
+        updateEliminatedFlags();
+        // Clear the eliminated flag image
+        lastEliminatedFlagEl.src = "";
+        lastEliminatedFlagEl.style.display = "none";
+        lastEliminatedNameEl.textContent = "";
+        // Ensure periodic eliminated announcements run for the new round
+        if (!window._eliminatedAnnounceTimer) {
+          window._lastEliminatedAnnounced =
+            window._lastEliminatedAnnounced || null;
+          window._eliminatedAnnounceTimer = setInterval(() => {
+            try {
+              if (eliminatedFlags && eliminatedFlags.length > 0) {
+                const code = eliminatedFlags[0];
+                if (code && code !== window._lastEliminatedAnnounced) {
+                  announceEliminated(code);
+                  window._lastEliminatedAnnounced = code;
+                }
+              }
+            } catch (e) {}
+          }, 4000);
+        }
+
+        createFlags();
+      }
+
+      function endGame(winnerCode) {
+        gameActive = false;
+        winners.unshift(winnerCode);
+        if (winners.length > 2) {
+          winners = winners.slice(0, 3);
+        }
+        updateLeaderboard();
+
+        // Store actual winner; defer speaking until the winner is rendered
+        window.actualWinner = winnerCode;
+
+        // Stop any ongoing or queued speech so "is out" announcements
+        // don't play after the final winner is shown.
+        try {
+          if (window.speechSynthesis) window.speechSynthesis.cancel();
+        } catch (e) {}
+
+        // Clear the periodic eliminated-announcement timer to prevent
+        // further "is out" announcements after the game ends.
+        try {
+          if (window._eliminatedAnnounceTimer) {
+            clearInterval(window._eliminatedAnnounceTimer);
+            window._eliminatedAnnounceTimer = null;
+          }
+        } catch (e) {}
+
+        if (restartTimeout) clearTimeout(restartTimeout);
+        restartTimeout = setTimeout(() => {
+          restartGame();
+        }, 5000);
+      }
+
+      function drawRing() {
+        // Draw main ring (white) with slimmer stroke
+        ctx.lineWidth = 12;
+        ctx.strokeStyle = "white";
+        ctx.beginPath();
+        ctx.arc(window.centerX, window.centerY, window.radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Draw the gap as a slightly thinner black arc so it blends with background
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "black";
+        ctx.beginPath();
+        ctx.arc(
+          window.centerX,
+          window.centerY,
+          window.radius,
+          rotation,
+          rotation + 0.8,
+        );
+        ctx.stroke();
+      }
+
+      function drawFlags() {
+        // First update positions so collisions use moved positions
+        flags.forEach((f) => {
+          if (!f.dead) f.update();
+        });
+
+        // Handle simple flag-flag collisions to create motion on contact
+        let collisionThreshold = window.innerWidth <= 480 ? 16 : 24; // smaller on mobile
+        for (let i = 0; i < flags.length; i++) {
+          const A = flags[i];
+          if (A.dead) continue;
+          for (let j = i + 1; j < flags.length; j++) {
+            const B = flags[j];
+            if (B.dead) continue;
+
+            // If either flag is very close to the outer boundary, skip collision
+            // so it can pass through the gap reliably on small screens
+            let dax = A.x - window.centerX;
+            let day = A.y - window.centerY;
+            let dbx = B.x - window.centerX;
+            let dby = B.y - window.centerY;
+            let distAedge = Math.sqrt(dax * dax + day * day);
+            let distBedge = Math.sqrt(dbx * dbx + dby * dby);
+            if (
+              distAedge > window.radius * 0.9 ||
+              distBedge > window.radius * 0.9
+            )
+              continue;
+
+            let dx = A.x - B.x;
+            let dy = A.y - B.y;
+            let dist2 = dx * dx + dy * dy;
+            let minDist = collisionThreshold;
+
+            if (dist2 > 0 && dist2 < minDist * minDist) {
+              let dist = Math.sqrt(dist2);
+              let nx = dx / dist;
+              let ny = dy / dist;
+
+              // push them apart to resolve overlap
+              let overlap = minDist - dist;
+              let sepX = (nx * overlap) / 2;
+              let sepY = (ny * overlap) / 2;
+              A.x += sepX;
+              A.y += sepY;
+              B.x -= sepX;
+              B.y -= sepY;
+
+              // simple elastic impulse along normal
+              let rvx = A.vx - B.vx;
+              let rvy = A.vy - B.vy;
+              let relVel = rvx * nx + rvy * ny;
+              if (relVel < 0) {
+                const aliveCount = flags.length;
+                const isEndgame = aliveCount <= 6;
+                const isFinalDuel = aliveCount <= 3;
+                let restitution = isFinalDuel ? 0.94 : isEndgame ? 0.96 : 0.86;
+                let impulseBoost = isFinalDuel ? 1.35 : isEndgame ? 1.55 : 1.22;
+                let impulse =
+                  ((-(1 + restitution) * relVel) / 2) * impulseBoost; // equal mass + boost
+                A.vx += impulse * nx;
+                A.vy += impulse * ny;
+                B.vx -= impulse * nx;
+                B.vy -= impulse * ny;
+
+                // Keep a minimum speed after impact so collisions don't feel sluggish.
+                let minSpeedAfterCollision = isFinalDuel
+                  ? 2.6
+                  : isEndgame
+                    ? 3.2
+                    : 2.1;
+                let speedA = Math.sqrt(A.vx * A.vx + A.vy * A.vy);
+                if (speedA < minSpeedAfterCollision && speedA > 0) {
+                  A.vx = (A.vx / speedA) * minSpeedAfterCollision;
+                  A.vy = (A.vy / speedA) * minSpeedAfterCollision;
+                }
+                let speedB = Math.sqrt(B.vx * B.vx + B.vy * B.vy);
+                if (speedB < minSpeedAfterCollision && speedB > 0) {
+                  B.vx = (B.vx / speedB) * minSpeedAfterCollision;
+                  B.vy = (B.vy / speedB) * minSpeedAfterCollision;
+                }
+                // play collision tone
+                try {
+                  playCollisionSound();
+                } catch (e) {}
+              }
+
+              // Clamp A inside the circle if collision pushed it outside
+              let cdxA = A.x - window.centerX;
+              let cdyA = A.y - window.centerY;
+              let distA = Math.sqrt(cdxA * cdxA + cdyA * cdyA);
+              if (distA > window.radius - 2) {
+                const aliveCount = flags.length;
+                const isEndgame = aliveCount <= 6;
+                const isFinalDuel = aliveCount <= 3;
+                let angA = Math.atan2(cdyA, cdxA);
+                A.x = window.centerX + Math.cos(angA) * (window.radius - 2);
+                A.y = window.centerY + Math.sin(angA) * (window.radius - 2);
+                // reflect and damp velocity
+                const reboundA = isFinalDuel
+                  ? -1.02
+                  : isEndgame
+                    ? -1.05
+                    : -0.95;
+                A.vx *= reboundA;
+                A.vy *= reboundA;
+                // small inward nudge
+                const inwardNudgeA = isFinalDuel ? 0.7 : isEndgame ? 1.0 : 0.75;
+                A.vx += -Math.cos(angA) * inwardNudgeA;
+                A.vy += -Math.sin(angA) * inwardNudgeA;
+              }
+
+              // Clamp B inside the circle if collision pushed it outside
+              let cdxB = B.x - window.centerX;
+              let cdyB = B.y - window.centerY;
+              let distB = Math.sqrt(cdxB * cdxB + cdyB * cdyB);
+              if (distB > window.radius - 2) {
+                const aliveCount = flags.length;
+                const isEndgame = aliveCount <= 6;
+                const isFinalDuel = aliveCount <= 3;
+                let angB = Math.atan2(cdyB, cdxB);
+                B.x = window.centerX + Math.cos(angB) * (window.radius - 2);
+                B.y = window.centerY + Math.sin(angB) * (window.radius - 2);
+                const reboundB = isFinalDuel
+                  ? -1.02
+                  : isEndgame
+                    ? -1.05
+                    : -0.95;
+                B.vx *= reboundB;
+                B.vy *= reboundB;
+                const inwardNudgeB = isFinalDuel ? 0.7 : isEndgame ? 1.0 : 0.75;
+                B.vx += -Math.cos(angB) * inwardNudgeB;
+                B.vy += -Math.sin(angB) * inwardNudgeB;
+              }
+            }
+          }
+        }
+
+        // Draw flags after collision adjustments
+        flags.forEach((f) => {
+          if (!f.dead) {
+            f.draw();
+          }
+        });
+
+        let aliveFlags = [];
+        let hadNewElimination = false;
+        let latestEliminatedCode = null;
+        for (let i = 0; i < flags.length; i++) {
+          const f = flags[i];
+          if (f.dead) {
+            if (!eliminatedFlags.includes(f.code)) {
+              eliminatedFlags.unshift(f.code);
+              hadNewElimination = true;
+              latestEliminatedCode = f.code;
+            }
+          } else {
+            aliveFlags.push(f);
+          }
+        }
+
+        if (hadNewElimination) {
+          updateEliminatedFlags();
+          lastEliminatedFlagEl.src =
+            "https://flagcdn.com/w40/" +
+            latestEliminatedCode.toLowerCase() +
+            ".png";
+          lastEliminatedFlagEl.style.display = "block";
+          lastEliminatedNameEl.textContent =
+            countryNames[latestEliminatedCode] || latestEliminatedCode;
+        }
+
+        flags = aliveFlags;
+
+        aliveEl.textContent = String(flags.length);
+
+        if (gameActive && flags.length === 1) {
+          endGame(flags[0].code);
+        }
+
+        if (!gameActive && flags.length === 1) {
+          // Draw semi-transparent background in center circle area
+          ctx.fillStyle = "rgba(0,0,0,0.6)";
+          ctx.beginPath();
+          ctx.arc(
+            window.centerX,
+            window.centerY,
+            window.radius * 0.92,
+            0,
+            Math.PI * 2,
+          );
+          ctx.fill();
+
+          ctx.fillStyle = "white";
+          ctx.textAlign = "center";
+
+          ctx.drawImage(
+            flags[0].img,
+            window.centerX - 25,
+            window.centerY - 55,
+            50,
+            35,
+          );
+
+          ctx.font = "bold 20px Arial";
+          ctx.fillText(
+            countryNames[flags[0].code] + " WINS 🎉",
+            window.centerX,
+            window.centerY + 30,
+          );
+
+          // Speak the actual winner exactly when displayed (only once)
+          if (!window._winnerAnnounced) {
+            try {
+              speakWinner(window.actualWinner || flags[0].code);
+            } catch (e) {}
+            window._winnerAnnounced = true;
+          }
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        rotation += rotationSpeed;
+
+        drawRing();
+        drawFlags();
+
+        requestAnimationFrame(animate);
+      }
+
+      function buildFlagGrid() {
+        const grid = document.getElementById("flagsGrid");
+
+        flagList.forEach((code) => {
+          let div = document.createElement("div");
+
+          div.className = "flagBtn";
+
+          let img = document.createElement("img");
+
+          img.src = "https://flagcdn.com/w40/" + code.toLowerCase() + ".png";
+
+          div.appendChild(img);
+
+          grid.appendChild(div);
+        });
+      }
+
+      createFlags();
+      // Start periodic eliminated announcements (every 10s)
+      if (!window._eliminatedAnnounceTimer) {
+        window._lastEliminatedAnnounced =
+          window._lastEliminatedAnnounced || null;
+        window._eliminatedAnnounceTimer = setInterval(() => {
+          try {
+            // Announce the most recently eliminated flag (index 0 because we use unshift)
+            if (eliminatedFlags && eliminatedFlags.length > 0) {
+              const code = eliminatedFlags[0];
+              if (code && code !== window._lastEliminatedAnnounced) {
+                announceEliminated(code);
+                window._lastEliminatedAnnounced = code;
+              }
+            }
+          } catch (e) {}
+        }, 4000); // 10 seconds
+      }
+      buildFlagGrid();
+      updateLeaderboard();
+      updateEliminatedFlags();
+      animate();
+    </script>
+
+    <!-- YouTube Live Chat API -->
+    <style>
+      #liveComments {
+        width: 95%;
+        margin-top: -20px;
+
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 6px;
+
+        min-height: 75px;
+        overflow-y: auto;
+      }
+
+      /* comment box */
+
+      .comment {
+        background: #2f5f2f;
+        border: 1px solid #1c3a1c;
+        border-radius: 12px;
+
+        /* padding: 6px 10px; */
+        font-size: 17px;
+
+        width: fit-content;
+        min-width: 180px;
+        max-width: 220px;
+
+        word-break: break-word;
+        box-sizing: border-box;
+
+        /* FIX */
+        max-height: 75px;
+        overflow-y: auto;
+
+        /* blinking animation */
+        animation: blinkComment 2s infinite;
+      }
+
+      /* username */
+
+      .comment strong {
+        color: yellow;
+        font-weight: bold;
+        font-size: 12px;
+      }
+
+      /* message */
+
+      .comment span {
+        color: white;
+      }
+
+      /* blinking animation */
+
+      @keyframes blinkComment {
+        0% {
+          background: #2f5f2f;
+          border-color: #1c3a1c;
+          transform: scale(1);
+          box-shadow: none;
+        }
+
+        50% {
+          background: #3fa63f;
+          border-color: #7fff7f;
+          transform: scale(1.05);
+          box-shadow: 0 0 10px #4cff4c;
+        }
+
+        100% {
+          background: #2f5f2f;
+          border-color: #1c3a1c;
+          transform: scale(1);
+          box-shadow: none;
+        }
+      }
+
+      /* scrollbar inside comment */
+
+      .comment::-webkit-scrollbar {
+        width: 4px;
+      }
+
+      .comment::-webkit-scrollbar-thumb {
+        background: #6cff6c;
+        border-radius: 10px;
+      }
+
+      .comment::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      /* ---------------- MOBILE ---------------- */
+
+      @media (max-width: 768px) {
+        #liveComments {
+          width: 95%;
+          gap: 5px;
+        }
+
+        .comment {
+          font-size: 13px;
+          padding: 5px 8px;
+          min-width: 180px;
+          max-width: 180px;
+          max-height: 75px;
+        }
+      }
+
+      /* -------- SMALL PHONES -------- */
+
+      @media (max-width: 480px) {
+        #liveComments {
+          width: 98%;
+          gap: 4px;
+          max-height: 70px;
+          padding-bottom: 18px;
+        }
+
+        .comment {
+          font-size: 12px;
+          padding: 5px 7px;
+          min-width: 100px;
+          max-width: 140px;
+          max-height: 75px;
+          overflow-y: auto;
+        }
+      }
+    </style>
+  </body>
+</html>
